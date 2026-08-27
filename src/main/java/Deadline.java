@@ -1,12 +1,23 @@
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 public class Deadline extends Todo{
-    protected String deadline;
+    //rn make deadline a LocalDate var, stores date,
+    // and then parse the string for deadline into date, and parse the 2nd half as time
+    protected LocalDateTime deadline;
     public Deadline(String description, String deadline) {
         super(description);
-        this.deadline = deadline;
+        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+
+        this.deadline= LocalDateTime.parse(deadline, inputFormat);
     }
+
+
     public Deadline(String description, String deadline, boolean isDone) {
         super(description, isDone);
-        this.deadline = deadline;
+        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+
+        this.deadline= LocalDateTime.parse(deadline, inputFormat);
     }
     @Override
     public String getTaskType(){
@@ -14,11 +25,14 @@ public class Deadline extends Todo{
     }
     @Override
     public String getTaskDescription(){
-        return this.getTaskType() + this.getStatusIcon() + " " + description + " (by: " + this.deadline + ")\n";
+        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("MMM dd yyyy h.mma");
+        String formattedDate = this.deadline.format(outputFormat);
+        return this.getTaskType() + this.getStatusIcon() + " " + description + " (by: " + formattedDate + ")\n";
         //print task
     }
     public String toFileFormat() {
         // 1 for done, 0 for undone
+
         int isDone = this.isDone ? 1 : 0;
         return "D | " + isDone + " | " + this.description + "|" + this.deadline;
     }

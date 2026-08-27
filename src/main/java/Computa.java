@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 public class Computa {
     public static void main(String[] args) {
         String banner = "haiii i am computa! lmk what u need ehaha";
@@ -96,7 +98,7 @@ public class Computa {
                             //part 0: deadline desc, 1: duedate
 
                             desc = parts[0].substring(parts[0].indexOf(" ") + 1);
-                            dueDate = parts[1];
+                            dueDate = parts[1].trim();
                             Deadline deadline = new Deadline(desc, dueDate);
                             todo.add(deadline);
 
@@ -115,8 +117,9 @@ public class Computa {
                             //event desc/dueDATE/ start date
 
                             desc = part[0].substring(part[0].indexOf(" ") + 1);
-                            Event event = new Event(desc, part[1], part[2]);
+                            Event event = new Event(desc, part[1].trim(), part[2].trim());
                             todo.add(event);
+//make sure u trim the string before passing it to constructor -> to be converted to date/time
 
                             break;
                         default:
@@ -147,10 +150,14 @@ public class Computa {
     }
     //loadTasks will load from file -> todo array
     private static void loadTasks(ArrayList<Todo> todo) {
-        System.out.println("loaded");
+
         try {
-            java.io.File f = new java.io.File("./tasks.txt");
-            if (!f.exists()) return;
+            java.io.File f = new java.io.File("./src/main/java/tasks.txt");
+            if (!f.exists()) {
+
+                f.createNewFile();
+                return;
+            }
 
             Scanner s = new Scanner(f); //take file contents as input
             while (s.hasNext()) {
@@ -167,7 +174,7 @@ public class Computa {
                 String type = result[0];
                 switch (type){
                     case "T":
-
+System.out.println("here");
                        Todo td=  new Todo(result[2], Integer.parseInt(result[1]) != 0);
                         todo.add(td);
 
@@ -186,11 +193,16 @@ public class Computa {
         } catch (java.io.FileNotFoundException e) {
             System.out.println("no saved tasks found girl, starting fresh!");
         }
+        catch (java.io.IOException e) {
+            // Note: we changed FileNotFoundException to IOException because
+            // createNewFile() can throw an IOException!
+            System.out.println("bruh something went wrong with the file: " + e.getMessage());
+        }
     }
     private static void saveTasks(ArrayList<Todo> todo) {
         try {
 
-            java.io.FileWriter fw = new java.io.FileWriter("./tasks.txt");
+            java.io.FileWriter fw = new java.io.FileWriter("./src/main/java/tasks.txt");
             for (Todo task : todo) {
                 fw.write(task.toFileFormat() + System.lineSeparator());
                 //write each task in todolist into the file tasks.txt, in the correct format
