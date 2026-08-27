@@ -1,5 +1,9 @@
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 public class Computa {
     public static void main(String[] args) {
         String banner = "haiii i am computa! lmk what u need ehaha";
@@ -7,6 +11,12 @@ public class Computa {
         Scanner scanner = new Scanner(System.in);
         String command = scanner.nextLine();
         ArrayList<Todo> todo = new ArrayList<>();// array of Tasks
+        //here, load the array of tasks into this arraylist, import from tasks.txt
+        //every time we make a change, tasks array is updated (remove /add elem) -> update the tasks.txt file too
+        //function to update tasks.txt file, function to load the tasks into the array at the beginning
+        //func for each task to parse and
+// when we start, call everyt from tasks.txt
+        loadTasks(todo);
         while(!command.equals("bye")){
             try {
                 if (command.equals("list")) {
@@ -37,6 +47,7 @@ public class Computa {
                         todo.get(number - 1).changeStatusIcon();
                         //mark the task at that index of the todo
                         System.out.println("ok this task is done neow\n" + todo.get(number - 1).getTaskDescription());
+                        saveTasks(todo);
                     command = scanner.nextLine();
                         continue;
 
@@ -49,6 +60,7 @@ public class Computa {
                         todo.remove(number - 1);
                         //mark the task at that index of the todo
                         System.out.println("ok this task is removed neow\n" + removedtask);
+                        saveTasks(todo);
                     command = scanner.nextLine();
                         continue;
 
@@ -125,11 +137,70 @@ public class Computa {
             catch(ComputaException e){
                 System.out.println(e.getMessage());
             }
+            //aft each update, make sure u save d update in tasks.txt
+            saveTasks(todo);
             command = scanner.nextLine();
         }
         System.out.println("Bai Bai! How much wood could a wood chuck chuck..");
         scanner.close();
 
     }
+    //loadTasks will load from file -> todo array
+    private static void loadTasks(ArrayList<Todo> todo) {
+        System.out.println("loaded");
+        try {
+            java.io.File f = new java.io.File("./tasks.txt");
+            if (!f.exists()) return;
+
+            Scanner s = new Scanner(f); //take file contents as input
+            while (s.hasNext()) {
+                String line = s.nextLine();
+                //each task from the tasks.txt will be in format
+                //T | 1 | desc
+                //E | 1 | desc |from | to
+                //D | 1 | desc | deadline
+                //shldnt do this storage of tasks in the same way as task desc task desc is TOO HARD TO PARSE
+               //get each line from the file, put it to the todolist
+                String[] result = line.split("\\s*\\|\\s*");
+
+                //result is an array of strings
+                String type = result[0];
+                switch (type){
+                    case "T":
+
+                       Todo td=  new Todo(result[2], Integer.parseInt(result[1]) != 0);
+                        todo.add(td);
+
+                        break;
+                    case "D":
+                        Deadline dl= new Deadline(result[2], result[3],Integer.parseInt(result[1]) != 0 );
+                        todo.add(dl);
+                        break;
+                    case "E":
+                        Event e = new Event(result[2], result[3], result[4], Integer.parseInt(result[1]) != 0 );
+                        todo.add(e);
+                       break;
+                }
+
+            }
+        } catch (java.io.FileNotFoundException e) {
+            System.out.println("no saved tasks found girl, starting fresh!");
+        }
+    }
+    private static void saveTasks(ArrayList<Todo> todo) {
+        try {
+
+            java.io.FileWriter fw = new java.io.FileWriter("./tasks.txt");
+            for (Todo task : todo) {
+                fw.write(task.toFileFormat() + System.lineSeparator());
+                //write each task in todolist into the file tasks.txt, in the correct format
+
+            }
+            fw.close();
+        } catch (java.io.IOException e) {
+            System.out.println("bruh the file won't save: " + e.getMessage());
+        }
+    }
+
 
 }

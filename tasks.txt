@@ -1,0 +1,5 @@
+T | 0 | yearn
+T | 0 | larp
+D | 1 | |goon 
+D | 1 | goon|by tmr
+T | 0 | study
