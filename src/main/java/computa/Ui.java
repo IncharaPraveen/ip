@@ -1,3 +1,5 @@
+package computa;
+
 import java.util.Scanner;
 
 public class Ui {

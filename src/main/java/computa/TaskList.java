@@ -1,3 +1,5 @@
+package computa;
+
 import java.util.ArrayList;
 
 public class TaskList {
@@ -8,7 +10,7 @@ public class TaskList {
         this.tasks = new ArrayList<>();
     }
 
-    // Constructor for loading from Storage
+    // Constructor for loading from computa.Storage
     public TaskList(ArrayList<Todo> tasks) {
         this.tasks = tasks;
     }

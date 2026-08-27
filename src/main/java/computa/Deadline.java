@@ -1,7 +1,8 @@
-import java.time.LocalDate;
+package computa;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-public class Deadline extends Todo{
+public class Deadline extends Todo {
     //rn make deadline a LocalDate var, stores date,
     // and then parse the string for deadline into date, and parse the 2nd half as time
     protected LocalDateTime deadline;

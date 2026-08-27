@@ -1,5 +1,7 @@
+package computa;
+
 public class Parser {
-    public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage) throws ComputaException {
+    public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage) throws Computa.ComputaException {
         if (command.equals("bye")) {
             return true; // Signals the main loop to exit
         }
@@ -44,7 +46,7 @@ public class Parser {
         switch (taskType) {
             case "todo":
                 if (command.split(" ").length == 1) {
-                    throw new ComputaException("no desc?");
+                    throw new Computa.ComputaException("no desc?");
                 }
                 desc = command.substring(command.indexOf(" ") + 1).trim();
                 taskList.addTask(new Todo(desc));
@@ -52,10 +54,10 @@ public class Parser {
             case "deadline":
                 String[] parts = command.split("/");
                 if (parts[0].indexOf(" ") == -1) {
-                    throw new ComputaException("no desc?");
+                    throw new Computa.ComputaException("no desc?");
                 }
                 if (parts.length == 1) {
-                    throw new ComputaException("no deadline?");
+                    throw new Computa.ComputaException("no deadline?");
                 }
                 desc = parts[0].substring(parts[0].indexOf(" ") + 1).trim();
                 dueDate = parts[1].trim();
@@ -64,20 +66,20 @@ public class Parser {
             case "event":
                 String[] part = command.split("/");
                 if (part[0].indexOf(" ") == -1) {
-                    throw new ComputaException("no desc?");
+                    throw new Computa.ComputaException("no desc?");
                 }
                 if (part.length < 3) {
-                    throw new ComputaException("no dates set?");
+                    throw new Computa.ComputaException("no dates set?");
                 }
                 desc = part[0].substring(part[0].indexOf(" ") + 1).trim();
                 taskList.addTask(new Event(desc, part[1].trim(), part[2].trim()));
                 break;
             default:
-                throw new ComputaException("bruh what is u talkin about");
+                throw new Computa.ComputaException("bruh what is u talkin about");
         }
 
         if (desc.equals("")) {
-            throw new ComputaException("you forgot to desc ur task. lock in bruh");
+            throw new Computa.ComputaException("you forgot to desc ur task. lock in bruh");
         }
 
         ui.showMessage("added: " + taskList.getTask(taskList.getSize() - 1).getTaskDescription());

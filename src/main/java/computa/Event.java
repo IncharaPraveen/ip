@@ -1,7 +1,8 @@
-import java.time.LocalDate;
+package computa;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-public class Event extends Deadline{
+public class Event extends Deadline {
     protected LocalDateTime start;
     public Event(String description, String start, String deadline){
         super(description, deadline);

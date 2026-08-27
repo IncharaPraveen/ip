@@ -1,3 +1,5 @@
+package computa;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,7 +14,7 @@ public class Storage {
         this.filePath = filePath;
     }
 
-    public ArrayList<Todo> load() throws ComputaException {
+    public ArrayList<Todo> load() throws Computa.ComputaException {
         ArrayList<Todo> todo = new ArrayList<>();
         try {
             File f = new File(filePath);
@@ -41,9 +43,9 @@ public class Storage {
                 }
             }
         } catch (FileNotFoundException e) {
-            throw new ComputaException("no saved tasks found girl, starting fresh!");
+            throw new Computa.ComputaException("no saved tasks found girl, starting fresh!");
         } catch (IOException e) {
-            throw new ComputaException("bruh something went wrong with the file: " + e.getMessage());
+            throw new Computa.ComputaException("bruh something went wrong with the file: " + e.getMessage());
         }
         return todo;
     }
