@@ -1,16 +1,25 @@
-import java.util.Scanner;
+
+package computa;
+import computa.Parser;
+import computa.Storage;
+import computa.TaskList;
+import computa.Ui;
+
+/*import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 public class Computa {
     public static void main(String[] args) {
         String banner = "haiii i am computa! lmk what u need ehaha";
         System.out.println(banner);
         Scanner scanner = new Scanner(System.in);
         String command = scanner.nextLine();
-        ArrayList<Todo> todo = new ArrayList<>();// array of Tasks
+        ArrayList<computa.Todo> todo = new ArrayList<>();// array of Tasks
         //here, load the array of tasks into this arraylist, import from tasks.txt
         //every time we make a change, tasks array is updated (remove /add elem) -> update the tasks.txt file too
         //function to update tasks.txt file, function to load the tasks into the array at the beginning
@@ -21,7 +30,7 @@ public class Computa {
             try {
                 if (command.equals("list")) {
                     int i = 1;
-                    for (Todo task : todo) {
+                    for (computa.Todo task : todo) {
                         System.out.println(i + ". " + task.getTaskDescription());
                         i++;
                     }
@@ -77,54 +86,55 @@ public class Computa {
                         case "todo":
 
                             if(command.split(" ").length == 1){
-                                throw new ComputaException("no desc?");
+                                throw new Computa.ComputaException("no desc?");
                             }
                                 desc = command.split(" ")[1];
-                            Todo task = new Todo(desc);
+                            computa.Todo task = new computa.Todo(desc);
                             todo.add(task);//pass task with undone
                             break;
                         case "deadline":
                             String parts[] = command.split("/");
                             if(parts[0].indexOf(" ") == -1){
-                                throw new ComputaException("no desc?");
+                                throw new Computa.ComputaException("no desc?");
                             }
                             if(parts.length == 1){
                                 //means no /,
-                                throw new ComputaException("no deadline?");
+                                throw new Computa.ComputaException("no deadline?");
 
                             }
                             //part 0: deadline desc, 1: duedate
 
                             desc = parts[0].substring(parts[0].indexOf(" ") + 1);
-                            dueDate = parts[1];
-                            Deadline deadline = new Deadline(desc, dueDate);
+                            dueDate = parts[1].trim();
+                            computa.Deadline deadline = new computa.Deadline(desc, dueDate);
                             todo.add(deadline);
 
                             break;
                         case "event":
                             String part[] = command.split("/");
                             if(part[0].indexOf(" ") == -1){
-                                throw new ComputaException("no desc?");
+                                throw new Computa.ComputaException("no desc?");
                             }
 
                             if(part.length < 3){
                                 //means no /,
-                                throw new ComputaException("no dates set?");
+                                throw new Computa.ComputaException("no dates set?");
 
                             }
                             //event desc/dueDATE/ start date
 
                             desc = part[0].substring(part[0].indexOf(" ") + 1);
-                            Event event = new Event(desc, part[1], part[2]);
+                            computa.Event event = new computa.Event(desc, part[1].trim(), part[2].trim());
                             todo.add(event);
+//make sure u trim the string before passing it to constructor -> to be converted to date/time
 
                             break;
                         default:
-                            throw new ComputaException("bruh what is u talkin about");
+                            throw new Computa.ComputaException("bruh what is u talkin about");
 
                     }
                     if(desc.equals("")){
-                        throw new ComputaException("you forgot to desc ur task. lock in bruh");
+                        throw new Computa.ComputaException("you forgot to desc ur task. lock in bruh");
                     }
                     System.out.println("added: " + todo.get(todo.toArray().length - 1).getTaskDescription());
                     System.out.println("Now u got " + todo.toArray().length + " numba of tasks in da list ");
@@ -134,7 +144,7 @@ public class Computa {
             catch(IndexOutOfBoundsException e){
                 System.out.println("that task number doesnt exist girl");
             }
-            catch(ComputaException e){
+            catch(Computa.ComputaException e){
                 System.out.println(e.getMessage());
             }
             //aft each update, make sure u save d update in tasks.txt
@@ -146,11 +156,15 @@ public class Computa {
 
     }
     //loadTasks will load from file -> todo array
-    private static void loadTasks(ArrayList<Todo> todo) {
-        System.out.println("loaded");
+    private static void loadTasks(ArrayList<computa.Todo> todo) {
+
         try {
-            java.io.File f = new java.io.File("./tasks.txt");
-            if (!f.exists()) return;
+            java.io.File f = new java.io.File("./src/main/java/tasks.txt");
+            if (!f.exists()) {
+
+                f.createNewFile();
+                return;
+            }
 
             Scanner s = new Scanner(f); //take file contents as input
             while (s.hasNext()) {
@@ -167,17 +181,17 @@ public class Computa {
                 String type = result[0];
                 switch (type){
                     case "T":
-
-                       Todo td=  new Todo(result[2], Integer.parseInt(result[1]) != 0);
+System.out.println("here");
+                       computa.Todo td=  new computa.Todo(result[2], Integer.parseInt(result[1]) != 0);
                         todo.add(td);
 
                         break;
                     case "D":
-                        Deadline dl= new Deadline(result[2], result[3],Integer.parseInt(result[1]) != 0 );
+                        computa.Deadline dl= new computa.Deadline(result[2], result[3],Integer.parseInt(result[1]) != 0 );
                         todo.add(dl);
                         break;
                     case "E":
-                        Event e = new Event(result[2], result[3], result[4], Integer.parseInt(result[1]) != 0 );
+                        computa.Event e = new computa.Event(result[2], result[3], result[4], Integer.parseInt(result[1]) != 0 );
                         todo.add(e);
                        break;
                 }
@@ -186,12 +200,17 @@ public class Computa {
         } catch (java.io.FileNotFoundException e) {
             System.out.println("no saved tasks found girl, starting fresh!");
         }
+        catch (java.io.IOException e) {
+            // Note: we changed FileNotFoundException to IOException because
+            // createNewFile() can throw an IOException!
+            System.out.println("bruh something went wrong with the file: " + e.getMessage());
+        }
     }
-    private static void saveTasks(ArrayList<Todo> todo) {
+    private static void saveTasks(ArrayList<computa.Todo> todo) {
         try {
 
-            java.io.FileWriter fw = new java.io.FileWriter("./tasks.txt");
-            for (Todo task : todo) {
+            java.io.FileWriter fw = new java.io.FileWriter("./src/main/java/tasks.txt");
+            for (computa.Todo task : todo) {
                 fw.write(task.toFileFormat() + System.lineSeparator());
                 //write each task in todolist into the file tasks.txt, in the correct format
 
@@ -203,4 +222,56 @@ public class Computa {
     }
 
 
+}
+*/
+public class Computa {
+    private Storage storage;
+    private TaskList tasks;
+    private Ui ui;
+
+    public Computa(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        try {
+
+            tasks = new TaskList(storage.load());
+        } catch (ComputaException e) {
+            ui.showError(e.getMessage());
+            tasks = new TaskList();
+        }
+    }
+
+    public void run() {
+        ui.showWelcome();
+        boolean isExit = false;
+
+        while (!isExit) {
+            try {
+
+                String fullCommand = ui.readCommand();
+
+
+                isExit = Parser.parse(fullCommand, tasks, ui, storage);
+
+            } catch (IndexOutOfBoundsException e) {
+                ui.showError("that task number doesnt exist girl");
+            } catch (ComputaException e) {
+                ui.showError(e.getMessage());
+            } catch (NumberFormatException e) {
+                ui.showError("bruh put a real number");
+            }
+        }
+        ui.showGoodbye();
+    }
+
+    public static void main(String[] args) {
+
+        new Computa("./tasks.txt").run();
+    }
+
+    public static class ComputaException extends Exception{
+        public ComputaException(String msg) {
+            super(msg);
+        }
+    }
 }
