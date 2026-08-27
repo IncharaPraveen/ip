@@ -34,7 +34,9 @@ public class Deadline extends Todo{
         // 1 for done, 0 for undone
 
         int isDone = this.isDone ? 1 : 0;
-        return "D | " + isDone + " | " + this.description + "|" + this.deadline;
+        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+        String formattedDeadline = this.deadline.format(outputFormat);
+        return "D | " + isDone + " | " + this.description + "|" + formattedDeadline;
     }
 
 }

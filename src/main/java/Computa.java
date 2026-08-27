@@ -1,4 +1,4 @@
-import java.util.Scanner;
+/*import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.FileWriter;
@@ -215,4 +215,50 @@ System.out.println("here");
     }
 
 
+}
+*/
+public class Computa {
+    private Storage storage;
+    private TaskList tasks;
+    private Ui ui;
+
+    public Computa(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        try {
+
+            tasks = new TaskList(storage.load());
+        } catch (ComputaException e) {
+            ui.showError(e.getMessage());
+            tasks = new TaskList();
+        }
+    }
+
+    public void run() {
+        ui.showWelcome();
+        boolean isExit = false;
+
+        while (!isExit) {
+            try {
+
+                String fullCommand = ui.readCommand();
+
+
+                isExit = Parser.parse(fullCommand, tasks, ui, storage);
+
+            } catch (IndexOutOfBoundsException e) {
+                ui.showError("that task number doesnt exist girl");
+            } catch (ComputaException e) {
+                ui.showError(e.getMessage());
+            } catch (NumberFormatException e) {
+                ui.showError("bruh put a real number");
+            }
+        }
+        ui.showGoodbye();
+    }
+
+    public static void main(String[] args) {
+
+        new Computa("./src/main/java/tasks.txt").run();
+    }
 }
