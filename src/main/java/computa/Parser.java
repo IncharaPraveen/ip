@@ -1,6 +1,18 @@
 package computa;
-
+/**
+ * Processes and executes user commands for the Computa application.
+ */
 public class Parser {
+    /**
+     * Parses the raw user command string and performs the corresponding application logic.
+     *
+     * @param command  The full raw string input typed by the user.
+     * @param taskList The current TaskList containing all active tasks.
+     * @param ui       The Ui instance responsible for displaying output messages.
+     * @param storage  The Storage instance responsible for saving data after changes.
+     * @return {@code true} if the command signals the application to exit (e.g., "bye"), {@code false} otherwise.
+     * @throws Computa.ComputaException If the command format is invalid, missing required arguments, or unknown.
+     */
     public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage) throws Computa.ComputaException {
         if (command.equals("bye")) {
             return true; // Signals the main loop to exit

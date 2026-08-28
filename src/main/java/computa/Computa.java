@@ -224,6 +224,7 @@ System.out.println("here");
 
 }
 */
+
 public class Computa {
     private Storage storage;
     private TaskList tasks;
@@ -263,6 +264,11 @@ public class Computa {
         }
         ui.showGoodbye();
     }
+    /**
+     * The main method that serves as the entry point for the application.
+     *
+     * @param args Command line arguments (not used).
+     */
 
     public static void main(String[] args) {
 

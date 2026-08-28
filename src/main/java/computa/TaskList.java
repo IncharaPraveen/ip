@@ -1,7 +1,7 @@
 package computa;
 
 import java.util.ArrayList;
-
+import computa.Computa.ComputaException;
 public class TaskList {
     private ArrayList<Todo> tasks;
 
@@ -14,12 +14,22 @@ public class TaskList {
     public TaskList(ArrayList<Todo> tasks) {
         this.tasks = tasks;
     }
-
+    /**
+     * Adds a new task to the active task list.
+     *
+     * @param task The Task object (Todo, Deadline, or Event) to be added.
+     */
     public void addTask(Todo task) {
         tasks.add(task);
     }
-
-    public Todo deleteTask(int index) {
+    /**
+     * Deletes a task from the list based on its index number.
+     *
+     * @param index The 0-based index of the task to be removed.
+     * @return The Task object that was successfully removed.
+     * @throws ComputaException If the provided index is out of bounds.
+     */
+    public Todo deleteTask (int index) {
         return tasks.remove(index);
     }
 

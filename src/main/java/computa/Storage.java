@@ -6,14 +6,26 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.ArrayList;
-
+/**
+ * Handles the loading and saving of task data to a local file on the hard drive.
+ */
 public class Storage {
     private String filePath;
-
+    /**
+     * Constructs a Storage object with the specified file path.
+     *
+     * @param filePath The relative or absolute path where the data file is stored.
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
-
+    /**
+     * Loads the saved tasks from the data file into an ArrayList.
+     * If the file does not exist, it creates a new empty file.
+     *
+     * @return An ArrayList containing the tasks parsed from the file.
+     * @throws Computa.ComputaException If there is an issue reading the file or parsing its contents.
+     */
     public ArrayList<Todo> load() throws Computa.ComputaException {
         ArrayList<Todo> todo = new ArrayList<>();
         try {
@@ -49,7 +61,11 @@ public class Storage {
         }
         return todo;
     }
-
+    /**
+     * Saves the current list of tasks from the application to the data file.
+     *
+     * @param taskList The TaskList object containing the current tasks to be saved.
+     */
     public void saveTasks(TaskList taskList) {
         try {
             FileWriter fw = new FileWriter(filePath);
