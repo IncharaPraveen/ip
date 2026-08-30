@@ -5,8 +5,13 @@ package computa;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
 public class Event extends Deadline {
     protected LocalDateTime start;
+    private static final DateTimeFormatter INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+    private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("MMM dd yyyy h:mm a");
+    private static final DateTimeFormatter STORAGE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+
     /**
      * Creates an Event task with a specified description, start time, and end time.
      * The task is marked as undone by default.
@@ -16,11 +21,11 @@ public class Event extends Deadline {
      * @param deadline    The ending date and time, expected in yyyy-MM-dd HHmm format.
      * @throws DateTimeParseException If the date strings do not match the expected format.
      */
-    public Event(String description, String start, String deadline){
-        super(description, deadline);
-        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
-        this.start= LocalDateTime.parse(start, inputFormat);
+
+    public Event(String description, String start, String deadline) {
+        super(description, deadline);
+        this.start = LocalDateTime.parse(start, INPUT_FORMAT);
     }
     /**
      * Creates an Event task with a specified description, start time, end time, and completion status.
@@ -31,29 +36,27 @@ public class Event extends Deadline {
      * @param isDone      The completion status of the task.
      * @throws DateTimeParseException If the date strings do not match the expected format.
      */
-    public Event(String description, String start, String deadline, boolean isDone){
-        super(description, deadline, isDone);
-        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
-        this.start= LocalDateTime.parse(deadline, inputFormat);
+    public Event(String description, String start, String deadline, boolean isDone) {
+        super(description, deadline, isDone);
+        this.start = LocalDateTime.parse(start, INPUT_FORMAT);
     }
+
     @Override
-    public String getTaskType(){
+    public String getTaskType() {
         return "[E]";
     }
+
     @Override
-    public String getTaskDescription(){
-        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("MMM dd yyyy h:mm a");
-        String formattedStart = this.start.format(outputFormat);
-        String formattedEnd = this.deadline.format(outputFormat);
-        return this.getTaskType() + this.getStatusIcon() + " " + description + " (from:" + formattedStart+ " to:" + formattedEnd +  ")\n";
-        //print task
+    public String getTaskDescription() {
+        return getTaskType() + getStatusIcon() + " " + description + " (from: "
+                + start.format(DISPLAY_FORMAT) + " to: " + deadline.format(DISPLAY_FORMAT) + ")\n";
     }
+
+    @Override
     public String toFileFormat() {
-        // 1 for done, 0 for undone
-        int isDone = this.isDone ? 1 : 0;
-        DateTimeFormatter saveFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
-        String formattedDeadline = this.deadline.format(saveFormat);
-        return "E | " + isDone + " | " + this.description + "|" + this.start.format(saveFormat)  + "|" + formattedDeadline;
+        int completionStatus = isDone ? 1 : 0;
+        return "E | " + completionStatus + " | " + description + " |"
+                + start.format(STORAGE_FORMAT) + " |" + deadline.format(STORAGE_FORMAT);
     }
 }

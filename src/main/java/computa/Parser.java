@@ -3,101 +3,69 @@ package computa;
  * Processes and executes user commands for the Computa application.
  */
 public class Parser {
-    /**
-     * Parses the raw user command string and performs the corresponding application logic.
-     *
-     * @param command  The full raw string input typed by the user.
-     * @param taskList The current TaskList containing all active tasks.
-     * @param ui       The Ui instance responsible for displaying output messages.
-     * @param storage  The Storage instance responsible for saving data after changes.
-     * @return {@code true} if the command signals the application to exit (e.g., "bye"), {@code false} otherwise.
-     * @throws Computa.ComputaException If the command format is invalid, missing required arguments, or unknown.
-     */
-    public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage) throws Computa.ComputaException {
+    public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage)
+            throws Computa.ComputaException {
         if (command.equals("bye")) {
-            return true; // Signals the main loop to exit
+            return true;
         }
-
         if (command.equals("list")) {
             for (int i = 0; i < taskList.getSize(); i++) {
                 ui.showMessage((i + 1) + ". " + taskList.getTask(i).getTaskDescription());
             }
             return false;
         }
-
-        if (command.contains("unmark")) {
-            int number = Integer.parseInt(command.split(" ")[1]);
-            taskList.getTask(number - 1).changeStatusIcon();
-            ui.showMessage("ok this task is UNdone neow\n" + taskList.getTask(number - 1).getTaskDescription());
+        String[] commandParts = command.split(" ");
+        String commandName = commandParts[0];
+        if (commandName.equals("mark") || commandName.equals("unmark")) {
+            int taskNumber = Integer.parseInt(commandParts[1]);
+            Todo task = taskList.getTask(taskNumber - 1);
+            task.changeStatusIcon();
+            String status = commandName.equals("mark") ? "done" : "UNdone";
+            ui.showMessage("ok this task is " + status + " neow\n" + task.getTaskDescription());
+            storage.saveTasks(taskList);
+            return false;
+        }
+        if (commandName.equals("delete")) {
+            int taskNumber = Integer.parseInt(commandParts[1]);
+            Todo removedTask = taskList.deleteTask(taskNumber - 1);
+            ui.showMessage("ok this task is removed neow\n" + removedTask.getTaskDescription());
             storage.saveTasks(taskList);
             return false;
         }
 
-        if (command.contains("mark")) {
-            int number = Integer.parseInt(command.split(" ")[1]);
-            taskList.getTask(number - 1).changeStatusIcon();
-            ui.showMessage("ok this task is done neow\n" + taskList.getTask(number - 1).getTaskDescription());
-            storage.saveTasks(taskList);
-            return false;
-        }
-
-        if (command.contains("delete")) {
-            int number = Integer.parseInt(command.split(" ")[1]);
-            String removedtask = taskList.getTask(number - 1).getTaskDescription();
-            taskList.deleteTask(number - 1);
-            ui.showMessage("ok this task is removed neow\n" + removedtask);
-            storage.saveTasks(taskList);
-            return false;
-        }
-
-        // Handling creation commands (todo, deadline, event)
-        String taskType = command.split(" ")[0];
-        String desc = "";
-        String dueDate = "";
-
-        switch (taskType) {
-            case "todo":
-                if (command.split(" ").length == 1) {
+        String description;
+        switch (commandName) {
+            case "todo" -> {
+                if (commandParts.length == 1) {
                     throw new Computa.ComputaException("no desc?");
                 }
-                desc = command.substring(command.indexOf(" ") + 1).trim();
-                taskList.addTask(new Todo(desc));
-                break;
-            case "deadline":
-                String[] parts = command.split("/");
-                if (parts[0].indexOf(" ") == -1) {
-                    throw new Computa.ComputaException("no desc?");
-                }
-                if (parts.length == 1) {
+                description = command.substring(command.indexOf(" ") + 1).trim();
+                taskList.addTask(new Todo(description));
+            }
+            case "deadline" -> {
+                String[] deadlineParts = command.split("/");
+                if (deadlineParts.length < 2 || !deadlineParts[0].contains(" ")) {
                     throw new Computa.ComputaException("no deadline?");
                 }
-                desc = parts[0].substring(parts[0].indexOf(" ") + 1).trim();
-                dueDate = parts[1].trim();
-                taskList.addTask(new Deadline(desc, dueDate));
-                break;
-            case "event":
-                String[] part = command.split("/");
-                if (part[0].indexOf(" ") == -1) {
-                    throw new Computa.ComputaException("no desc?");
-                }
-                if (part.length < 3) {
+                description = deadlineParts[0].substring(deadlineParts[0].indexOf(" ") + 1).trim();
+                taskList.addTask(new Deadline(description, deadlineParts[1].trim()));
+            }
+            case "event" -> {
+                String[] eventParts = command.split("/");
+                if (eventParts.length < 3 || !eventParts[0].contains(" ")) {
                     throw new Computa.ComputaException("no dates set?");
                 }
-                desc = part[0].substring(part[0].indexOf(" ") + 1).trim();
-                taskList.addTask(new Event(desc, part[1].trim(), part[2].trim()));
-                break;
-            default:
-                throw new Computa.ComputaException("bruh what is u talkin about");
+                description = eventParts[0].substring(eventParts[0].indexOf(" ") + 1).trim();
+                taskList.addTask(new Event(description, eventParts[1].trim(), eventParts[2].trim()));
+            }
+            default -> throw new Computa.ComputaException("bruh what is u talkin about");
         }
-
-        if (desc.equals("")) {
+        if (description.isEmpty()) {
             throw new Computa.ComputaException("you forgot to desc ur task. lock in bruh");
         }
-
         ui.showMessage("added: " + taskList.getTask(taskList.getSize() - 1).getTaskDescription());
         ui.showMessage("Now u got " + taskList.getSize() + " numba of tasks in da list ");
         storage.saveTasks(taskList);
-
         return false;
     }
 }

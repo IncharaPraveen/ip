@@ -5,12 +5,12 @@ import java.util.Scanner;
  * Handles all user interface interactions, including reading standard input and displaying messages to the terminal.
  */
 public class Ui {
-    private Scanner scanner;
+    private final Scanner scanner;
     /**
      * Constructs a new Ui object and initializes the system input scanner.
      */
     public Ui() {
-        this.scanner = new Scanner(System.in);
+        scanner = new Scanner(System.in);
     }
     /**
      * Displays the initial welcome greeting when the chatbot boots up.

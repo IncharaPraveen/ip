@@ -2,16 +2,16 @@ package computa;
 
 import java.util.ArrayList;
 import computa.Computa.ComputaException;
-public class TaskList {
-    private ArrayList<Todo> tasks;
+import java.util.List;
 
-    // Constructor for starting fresh
+public class TaskList {
+    private final List<Todo> tasks;
+
     public TaskList() {
-        this.tasks = new ArrayList<>();
+        tasks = new ArrayList<>();
     }
 
-    // Constructor for loading from computa.Storage
-    public TaskList(ArrayList<Todo> tasks) {
+    public TaskList(List<Todo> tasks) {
         this.tasks = tasks;
     }
     /**

@@ -6,9 +6,8 @@ import java.time.format.DateTimeParseException;
 /**
  * Represents a task that needs to be completed by a specific date and time.
  */
+
 public class Deadline extends Todo {
-    //rn make deadline a LocalDate var, stores date,
-    // and then parse the string for deadline into date, and parse the 2nd half as time
     protected LocalDateTime deadline;
     /**
      * Creates a Deadline task with a specified description and due date.
@@ -17,11 +16,13 @@ public class Deadline extends Todo {
      * @param deadline       The due date and time, expected in yyyy-MM-dd HHmm format.
      * @throws DateTimeParseException If the date string does not match the expected format.
      */
+    private static final DateTimeFormatter INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+    private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("MMM dd yyyy h.mma");
+    private static final DateTimeFormatter STORAGE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+
     public Deadline(String description, String deadline) {
         super(description);
-        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
-
-        this.deadline= LocalDateTime.parse(deadline, inputFormat);
+        this.deadline = LocalDateTime.parse(deadline, INPUT_FORMAT);
     }
     /**
      * Creates a Deadline task with a specified description, due date, and completion status.
@@ -34,28 +35,24 @@ public class Deadline extends Todo {
 
     public Deadline(String description, String deadline, boolean isDone) {
         super(description, isDone);
-        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
-
-        this.deadline= LocalDateTime.parse(deadline, inputFormat);
+        this.deadline = LocalDateTime.parse(deadline, INPUT_FORMAT);
     }
+
     @Override
-    public String getTaskType(){
+    public String getTaskType() {
         return "[D]";
     }
+
     @Override
-    public String getTaskDescription(){
-        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("MMM dd yyyy h.mma");
-        String formattedDate = this.deadline.format(outputFormat);
-        return this.getTaskType() + this.getStatusIcon() + " " + description + " (by: " + formattedDate + ")\n";
-        //print task
+    public String getTaskDescription() {
+        return getTaskType() + getStatusIcon() + " " + description + " (by: "
+                + deadline.format(DISPLAY_FORMAT) + ")\n";
     }
+
+    @Override
     public String toFileFormat() {
-        // 1 for done, 0 for undone
-
-        int isDone = this.isDone ? 1 : 0;
-        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
-        String formattedDeadline = this.deadline.format(outputFormat);
-        return "D | " + isDone + " | " + this.description + "|" + formattedDeadline;
+        int completionStatus = isDone ? 1 : 0;
+        return "D | " + completionStatus + " | " + description + " |"
+                + deadline.format(STORAGE_FORMAT);
     }
-
 }
