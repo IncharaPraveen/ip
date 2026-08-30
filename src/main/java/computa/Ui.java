@@ -3,10 +3,10 @@ package computa;
 import java.util.Scanner;
 
 public class Ui {
-    private Scanner scanner;
+    private final Scanner scanner;
 
     public Ui() {
-        this.scanner = new Scanner(System.in);
+        scanner = new Scanner(System.in);
     }
 
     public void showWelcome() {

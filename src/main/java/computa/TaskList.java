@@ -1,17 +1,16 @@
 package computa;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TaskList {
-    private ArrayList<Todo> tasks;
+    private final List<Todo> tasks;
 
-    // Constructor for starting fresh
     public TaskList() {
-        this.tasks = new ArrayList<>();
+        tasks = new ArrayList<>();
     }
 
-    // Constructor for loading from computa.Storage
-    public TaskList(ArrayList<Todo> tasks) {
+    public TaskList(List<Todo> tasks) {
         this.tasks = tasks;
     }
 

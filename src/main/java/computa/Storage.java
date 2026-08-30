@@ -1,45 +1,38 @@
 package computa;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Storage {
-    private String filePath;
+    private final String filePath;
 
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
-    public ArrayList<Todo> load() throws Computa.ComputaException {
-        ArrayList<Todo> todo = new ArrayList<>();
+    public List<Todo> load() throws Computa.ComputaException {
+        List<Todo> tasks = new ArrayList<>();
         try {
-            File f = new File(filePath);
-            if (!f.exists()) {
-
-                f.createNewFile();
-                return todo;
+            File file = new File(filePath);
+            if (!file.exists()) {
+                file.createNewFile();
+                return tasks;
             }
-
-            Scanner s = new Scanner(f);
-            while (s.hasNext()) {
-                String line = s.nextLine();
-                String[] result = line.split("\\s*\\|\\s*");
-                String type = result[0];
-
-                switch (type) {
-                    case "T":
-                        todo.add(new Todo(result[2], Integer.parseInt(result[1]) != 0));
-                        break;
-                    case "D":
-                        todo.add(new Deadline(result[2], result[3], Integer.parseInt(result[1]) != 0));
-                        break;
-                    case "E":
-                        todo.add(new Event(result[2], result[3], result[4], Integer.parseInt(result[1]) != 0));
-                        break;
+            try (Scanner scanner = new Scanner(file)) {
+                while (scanner.hasNextLine()) {
+                    String[] taskData = scanner.nextLine().split("\\s*\\|\\s*");
+                    boolean isDone = Integer.parseInt(taskData[1]) != 0;
+                    switch (taskData[0]) {
+                        case "T" -> tasks.add(new Todo(taskData[2], isDone));
+                        case "D" -> tasks.add(new Deadline(taskData[2], taskData[3], isDone));
+                        case "E" -> tasks.add(new Event(taskData[2], taskData[3], taskData[4], isDone));
+                        default -> { }
+                    }
                 }
             }
         } catch (FileNotFoundException e) {
@@ -47,16 +40,14 @@ public class Storage {
         } catch (IOException e) {
             throw new Computa.ComputaException("bruh something went wrong with the file: " + e.getMessage());
         }
-        return todo;
+        return tasks;
     }
 
     public void saveTasks(TaskList taskList) {
-        try {
-            FileWriter fw = new FileWriter(filePath);
+        try (FileWriter writer = new FileWriter(filePath)) {
             for (int i = 0; i < taskList.getSize(); i++) {
-                fw.write(taskList.getTask(i).toFileFormat() + System.lineSeparator());
+                writer.write(taskList.getTask(i).toFileFormat() + System.lineSeparator());
             }
-            fw.close();
         } catch (IOException e) {
             System.out.println("bruh the file won't save: " + e.getMessage());
         }
