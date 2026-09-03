@@ -36,6 +36,25 @@ public class Computa {
         }
         ui.showGoodbye();
     }
+
+    /**
+     * Processes one command and returns the text that should be shown to a GUI.
+     *
+     * @param command the command entered by the user
+     * @return the chatbot response, including any error message
+     */
+    public String processCommand(String command) {
+        try {
+            Parser.parse(command, tasks, ui, storage);
+        } catch (IndexOutOfBoundsException e) {
+            ui.showError("that task number doesnt exist girl");
+        } catch (ComputaException e) {
+            ui.showError(e.getMessage());
+        } catch (NumberFormatException e) {
+            ui.showError("bruh put a real number");
+        }
+        return ui.collectOutput();
+    }
     /**
      * The main method that serves as the entry point for the application.
      *

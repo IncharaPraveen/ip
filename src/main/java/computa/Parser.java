@@ -35,10 +35,11 @@ public class Parser {
         //if the command contains "find", parse the searchword,
         // search each task in the tasklist's description for the word, if it contains, then add this task to a new list -> display this new list
         if (command.contains("find")) {
+            ui.showMessage("yoo these r the matching tasks!");
             String searchWord = command.substring(command.indexOf(" ") + 1).trim();
             for (int i = 0; i < taskList.getSize(); i++) {
                 Todo task = taskList.getTask(i);
-                System.out.println("yoo these r the matching tasks!");
+
                 if (task.getTaskDescription().contains(searchWord)) {
                     ui.showMessage((i + 1) + ". " + task.getTaskDescription());
                 }
