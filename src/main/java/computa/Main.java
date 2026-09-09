@@ -12,7 +12,10 @@ import javafx.stage.Stage;
 
 /** JavaFX user interface for the Computa chatbot. */
 public class Main extends Application {
-    private final Computa computa = new Computa("./tasks.txt");
+    private static final String TASK_FILE_PATH = "./tasks.txt";
+    private static final int WINDOW_WIDTH = 600;
+    private static final int WINDOW_HEIGHT = 450;
+    private final Computa computa = new Computa(TASK_FILE_PATH);
 
     @Override
     public void start(Stage stage) {
@@ -47,7 +50,7 @@ public class Main extends Application {
         root.setBottom(commandBar);
         BorderPane.setMargin(chat, new Insets(10));
         stage.setTitle("Computa");
-        stage.setScene(new Scene(root, 600, 450));
+        stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
         stage.show();
     }
 }
