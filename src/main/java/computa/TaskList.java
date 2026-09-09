@@ -12,6 +12,7 @@ public class TaskList {
     }
 
     public TaskList(List<Todo> tasks) {
+        assert tasks != null : "A task list cannot be initialized with null";
         this.tasks = tasks;
     }
     /**
@@ -20,7 +21,9 @@ public class TaskList {
      * @param task The Task object (Todo, Deadline, or Event) to be added.
      */
     public void addTask(Todo task) {
+        assert task != null : "The task list cannot contain a null task";
         tasks.add(task);
+        assert tasks.get(tasks.size() - 1) == task : "A newly added task must be stored";
     }
     /**
      * Deletes a task from the list based on its index number.
@@ -30,11 +33,15 @@ public class TaskList {
      * @throws ComputaException If the provided index is out of bounds.
      */
     public Todo deleteTask (int index) {
-        return tasks.remove(index);
+        Todo removedTask = tasks.remove(index);
+        assert removedTask != null : "A valid task index must remove a task";
+        return removedTask;
     }
 
     public Todo getTask(int index) {
-        return tasks.get(index);
+        Todo task = tasks.get(index);
+        assert task != null : "A valid task index must refer to a task";
+        return task;
     }
 
     public int getSize() {

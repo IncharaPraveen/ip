@@ -22,6 +22,7 @@ public class Deadline extends Todo {
 
     public Deadline(String description, String deadline) {
         super(description);
+        assert deadline != null && !deadline.isBlank() : "A deadline must have a date";
         this.deadline = LocalDateTime.parse(deadline, INPUT_FORMAT);
     }
     /**
@@ -35,6 +36,7 @@ public class Deadline extends Todo {
 
     public Deadline(String description, String deadline, boolean isDone) {
         super(description, isDone);
+        assert deadline != null && !deadline.isBlank() : "A deadline must have a date";
         this.deadline = LocalDateTime.parse(deadline, INPUT_FORMAT);
     }
 

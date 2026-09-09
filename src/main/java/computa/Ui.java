@@ -6,11 +6,13 @@ import java.util.Scanner;
  */
 public class Ui {
     private final Scanner scanner;
+    private final StringBuilder output;
     /**
      * Constructs a new Ui object and initializes the system input scanner.
      */
     public Ui() {
         scanner = new Scanner(System.in);
+        output = new StringBuilder();
     }
     /**
      * Displays the initial welcome greeting when the chatbot boots up.
@@ -33,6 +35,7 @@ public class Ui {
      */
     public void showMessage(String message) {
         System.out.println(message);
+        output.append(message).append(System.lineSeparator());
     }
     /**
      * Displays an error message to the user.
@@ -41,6 +44,14 @@ public class Ui {
      */
     public void showError(String message) {
         System.out.println(message);
+        output.append(message).append(System.lineSeparator());
+    }
+
+    /** Returns and clears messages collected while processing one GUI command. */
+    public String collectOutput() {
+        String messages = output.toString();
+        output.setLength(0);
+        return messages;
     }
     /**
      * Displays the parting farewell message and safely closes the system input scanner.

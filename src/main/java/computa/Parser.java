@@ -5,6 +5,10 @@ package computa;
 public class Parser {
     public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage)
             throws Computa.ComputaException {
+        assert command != null : "The parser must receive a command";
+        assert taskList != null : "The parser must receive a task list";
+        assert ui != null : "The parser must receive a UI";
+        assert storage != null : "The parser must receive storage";
         if (command.equals("bye")) {
             return true;
         }
@@ -35,10 +39,11 @@ public class Parser {
         //if the command contains "find", parse the searchword,
         // search each task in the tasklist's description for the word, if it contains, then add this task to a new list -> display this new list
         if (command.contains("find")) {
+            ui.showMessage("yoo these r the matching tasks!");
             String searchWord = command.substring(command.indexOf(" ") + 1).trim();
             for (int i = 0; i < taskList.getSize(); i++) {
                 Todo task = taskList.getTask(i);
-                System.out.println("yoo these r the matching tasks!");
+
                 if (task.getTaskDescription().contains(searchWord)) {
                     ui.showMessage((i + 1) + ". " + task.getTaskDescription());
                 }
@@ -74,6 +79,7 @@ public class Parser {
             }
             default -> throw new Computa.ComputaException("bruh what is u talkin about");
         }
+        assert taskList.getSize() > 0 : "Creating a task must leave at least one task";
         if (description.isEmpty()) {
             throw new Computa.ComputaException("you forgot to desc ur task. lock in bruh");
         }
