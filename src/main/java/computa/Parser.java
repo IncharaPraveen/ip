@@ -3,33 +3,45 @@ package computa;
  * Processes and executes user commands for the Computa application.
  */
 public class Parser {
+    private static final String COMMAND_EXIT = "bye";
+    private static final String COMMAND_LIST = "list";
+    private static final String COMMAND_FIND = "find";
+    private static final String COMMAND_MARK = "mark";
+    private static final String COMMAND_UNMARK = "unmark";
+    private static final String COMMAND_DELETE = "delete";
+
     public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage)
             throws Computa.ComputaException {
         assert command != null : "The parser must receive a command";
         assert taskList != null : "The parser must receive a task list";
         assert ui != null : "The parser must receive a UI";
         assert storage != null : "The parser must receive storage";
-        if (command.equals("bye")) {
-            return true;
+        String trimmedCommand = command.trim();
+        if (trimmedCommand.equals(COMMAND_EXIT)) {
+           return true; 
         }
-        if (command.equals("list")) {
+     
+        if (command.equals("bye")) {
+           
+        
+        if (trimmedCommand.equals(COMMAND_LIST)) {
             for (int i = 0; i < taskList.getSize(); i++) {
                 ui.showMessage((i + 1) + ". " + taskList.getTask(i).getTaskDescription());
             }
             return false;
         }
-        String[] commandParts = command.split(" ");
+        String[] commandParts = trimmedCommand.split("\\s+");
         String commandName = commandParts[0];
-        if (commandName.equals("mark") || commandName.equals("unmark")) {
+        if (commandName.equals(COMMAND_MARK) || commandName.equals(COMMAND_UNMARK)) {
             int taskNumber = Integer.parseInt(commandParts[1]);
             Todo task = taskList.getTask(taskNumber - 1);
             task.changeStatusIcon();
-            String status = commandName.equals("mark") ? "done" : "UNdone";
+            String status = commandName.equals(COMMAND_MARK) ? "done" : "UNdone";
             ui.showMessage("ok this task is " + status + " neow\n" + task.getTaskDescription());
             storage.saveTasks(taskList);
             return false;
         }
-        if (commandName.equals("delete")) {
+        if (commandName.equals(COMMAND_DELETE)) {
             int taskNumber = Integer.parseInt(commandParts[1]);
             Todo removedTask = taskList.deleteTask(taskNumber - 1);
             ui.showMessage("ok this task is removed neow\n" + removedTask.getTaskDescription());
@@ -38,9 +50,9 @@ public class Parser {
         }
         //if the command contains "find", parse the searchword,
         // search each task in the tasklist's description for the word, if it contains, then add this task to a new list -> display this new list
-        if (command.contains("find")) {
+        if (commandName.equals(COMMAND_FIND)) {
             ui.showMessage("yoo these r the matching tasks!");
-            String searchWord = command.substring(command.indexOf(" ") + 1).trim();
+            String searchWord = getArgument(trimmedCommand);
             for (int i = 0; i < taskList.getSize(); i++) {
                 Todo task = taskList.getTask(i);
 
@@ -58,7 +70,7 @@ public class Parser {
                 if (commandParts.length == 1) {
                     throw new Computa.ComputaException("no desc?");
                 }
-                description = command.substring(command.indexOf(" ") + 1).trim();
+                description = getArgument(trimmedCommand);
                 taskList.addTask(new Todo(description));
             }
             case "deadline" -> {
@@ -66,7 +78,7 @@ public class Parser {
                 if (deadlineParts.length < 2 || !deadlineParts[0].contains(" ")) {
                     throw new Computa.ComputaException("no deadline?");
                 }
-                description = deadlineParts[0].substring(deadlineParts[0].indexOf(" ") + 1).trim();
+                description = getArgument(deadlineParts[0]);
                 taskList.addTask(new Deadline(description, deadlineParts[1].trim()));
             }
             case "event" -> {
@@ -74,7 +86,7 @@ public class Parser {
                 if (eventParts.length < 3 || !eventParts[0].contains(" ")) {
                     throw new Computa.ComputaException("no dates set?");
                 }
-                description = eventParts[0].substring(eventParts[0].indexOf(" ") + 1).trim();
+                description = getArgument(eventParts[0]);
                 taskList.addTask(new Event(description, eventParts[1].trim(), eventParts[2].trim()));
             }
             default -> throw new Computa.ComputaException("bruh what is u talkin about");
@@ -87,5 +99,11 @@ public class Parser {
         ui.showMessage("Now u got " + taskList.getSize() + " numba of tasks in da list ");
         storage.saveTasks(taskList);
         return false;
+    }
+
+    /** Returns the text following the command name. */
+    private static String getArgument(String command) {
+        int separator = command.indexOf(' ');
+        return separator < 0 ? "" : command.substring(separator + 1).trim();
     }
 }

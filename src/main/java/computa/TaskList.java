@@ -1,9 +1,9 @@
 package computa;
 
 import java.util.ArrayList;
-import computa.Computa.ComputaException;
 import java.util.List;
 
+/** Stores and provides access to the user's tasks. */
 public class TaskList {
     private final List<Todo> tasks;
 

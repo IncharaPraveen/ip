@@ -12,6 +12,7 @@ import java.util.Scanner;
  * Handles the loading and saving of task data to a local file on the hard drive.
  */
 public class Storage {
+    private static final String FIELD_SEPARATOR_REGEX = "\\s*\\|\\s*";
     private final String filePath;
     /**
      * Constructs a Storage object with the specified file path.
@@ -39,7 +40,8 @@ public class Storage {
             }
             try (Scanner scanner = new Scanner(file)) {
                 while (scanner.hasNextLine()) {
-                    String[] taskData = scanner.nextLine().split("\\s*\\|\\s*");
+                    String[] taskData = scanner.nextLine().split(FIELD_SEPARATOR_REGEX);
+                
                     assert taskData.length >= 3 : "Each saved task needs a type, status, and description";
                     boolean isDone = Integer.parseInt(taskData[1]) != 0;
                     switch (taskData[0]) {

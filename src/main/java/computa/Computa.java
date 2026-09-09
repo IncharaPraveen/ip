@@ -5,6 +5,7 @@ import computa.TaskList;
 import computa.Ui;
 
 public class Computa {
+    private static final String TASK_FILE_PATH = "./tasks.txt";
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
@@ -65,7 +66,7 @@ public class Computa {
      */
 
     public static void main(String[] args) {
-        new Computa("./tasks.txt").run();
+        new Computa(TASK_FILE_PATH).run();
     }
 
     public static class ComputaException extends Exception {
