@@ -40,11 +40,18 @@ public class Storage {
             try (Scanner scanner = new Scanner(file)) {
                 while (scanner.hasNextLine()) {
                     String[] taskData = scanner.nextLine().split("\\s*\\|\\s*");
+                    assert taskData.length >= 3 : "Each saved task needs a type, status, and description";
                     boolean isDone = Integer.parseInt(taskData[1]) != 0;
                     switch (taskData[0]) {
                         case "T" -> tasks.add(new Todo(taskData[2], isDone));
-                        case "D" -> tasks.add(new Deadline(taskData[2], taskData[3], isDone));
-                        case "E" -> tasks.add(new Event(taskData[2], taskData[3], taskData[4], isDone));
+                        case "D" -> {
+                            assert taskData.length >= 4 : "A deadline must include a due date";
+                            tasks.add(new Deadline(taskData[2], taskData[3], isDone));
+                        }
+                        case "E" -> {
+                            assert taskData.length >= 5 : "An event must include start and end dates";
+                            tasks.add(new Event(taskData[2], taskData[3], taskData[4], isDone));
+                        }
                         default -> { }
                     }
                 }

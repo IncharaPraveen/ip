@@ -5,6 +5,10 @@ package computa;
 public class Parser {
     public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage)
             throws Computa.ComputaException {
+        assert command != null : "The parser must receive a command";
+        assert taskList != null : "The parser must receive a task list";
+        assert ui != null : "The parser must receive a UI";
+        assert storage != null : "The parser must receive storage";
         if (command.equals("bye")) {
             return true;
         }
@@ -75,6 +79,7 @@ public class Parser {
             }
             default -> throw new Computa.ComputaException("bruh what is u talkin about");
         }
+        assert taskList.getSize() > 0 : "Creating a task must leave at least one task";
         if (description.isEmpty()) {
             throw new Computa.ComputaException("you forgot to desc ur task. lock in bruh");
         }
