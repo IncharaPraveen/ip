@@ -24,6 +24,7 @@ public class Event extends Deadline {
 
     public Event(String description, String start, String deadline) {
         super(description, deadline);
+        assert start != null && !start.isBlank() : "An event must have a start date";
         this.start = LocalDateTime.parse(start, INPUT_FORMAT);
     }
     /**
@@ -38,6 +39,7 @@ public class Event extends Deadline {
 
     public Event(String description, String start, String deadline, boolean isDone) {
         super(description, deadline, isDone);
+        assert start != null && !start.isBlank() : "An event must have a start date";
         this.start = LocalDateTime.parse(start, INPUT_FORMAT);
     }
 

@@ -23,11 +23,12 @@ public class Main extends Application {
         chat.setEditable(false);
         chat.setWrapText(true);
         chat.setText("haiii i am computa! lmk what u need ehaha\n");
-
+//input is user's input,
         TextField input = new TextField();
         input.setPromptText("Enter a command, e.g. list or todo study");
         Button send = new Button("Send");
-
+//create a send button, setOnAction , call eventHandler submit -> we will send the input to Parser.java
+        //
         Runnable submit = () -> {
             String command = input.getText().trim();
             if (command.isEmpty()) {
@@ -43,6 +44,8 @@ public class Main extends Application {
         input.setOnAction(event -> submit.run());
 
         HBox commandBar = new HBox(8, input, send);
+        //create horizontally layed out input & sender
+
         HBox.setHgrow(input, javafx.scene.layout.Priority.ALWAYS);
         commandBar.setPadding(new Insets(10));
 
@@ -52,5 +55,7 @@ public class Main extends Application {
         stage.setTitle("Computa");
         stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
         stage.show();
+        //stage is whatever is on comp screen, attatch a scene to a stage ( scene contains all layout + ui elems)
+        //scene starts w root elem -> this is BoderPane, containing the chat
     }
 }

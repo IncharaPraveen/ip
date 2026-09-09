@@ -8,3 +8,4 @@ public class Launcher {
         Application.launch(Main.class, args);
     }
 }
+//this is application entry point now

@@ -11,6 +11,7 @@ public class Computa {
     private final Ui ui;
 
     public Computa(String filePath) {
+        assert filePath != null && !filePath.isBlank() : "The task file path must be usable";
         ui = new Ui();
         storage = new Storage(filePath);
         try {
@@ -19,6 +20,7 @@ public class Computa {
             ui.showError(e.getMessage());
             tasks = new TaskList();
         }
+        assert tasks != null : "Computa must always have a task list";
     }
 
     public void run() {
@@ -45,6 +47,7 @@ public class Computa {
      * @return the chatbot response, including any error message
      */
     public String processCommand(String command) {
+        assert command != null : "A command must be provided for processing";
         try {
             Parser.parse(command, tasks, ui, storage);
         } catch (IndexOutOfBoundsException e) {

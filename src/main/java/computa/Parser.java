@@ -12,10 +12,18 @@ public class Parser {
 
     public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage)
             throws Computa.ComputaException {
+        assert command != null : "The parser must receive a command";
+        assert taskList != null : "The parser must receive a task list";
+        assert ui != null : "The parser must receive a UI";
+        assert storage != null : "The parser must receive storage";
         String trimmedCommand = command.trim();
         if (trimmedCommand.equals(COMMAND_EXIT)) {
-            return true;
+           return true; 
         }
+     
+        if (command.equals("bye")) {
+           
+        
         if (trimmedCommand.equals(COMMAND_LIST)) {
             for (int i = 0; i < taskList.getSize(); i++) {
                 ui.showMessage((i + 1) + ". " + taskList.getTask(i).getTaskDescription());
@@ -83,6 +91,7 @@ public class Parser {
             }
             default -> throw new Computa.ComputaException("bruh what is u talkin about");
         }
+        assert taskList.getSize() > 0 : "Creating a task must leave at least one task";
         if (description.isEmpty()) {
             throw new Computa.ComputaException("you forgot to desc ur task. lock in bruh");
         }
