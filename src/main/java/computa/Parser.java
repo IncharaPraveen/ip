@@ -44,6 +44,12 @@ public class Parser {
         return false;
     }
 
+    /**
+     * Displays all visible tasks with one-based indices.
+     *
+     * @param taskList the task list whose visible tasks should be displayed
+     * @param ui the user interface used to display each task
+     */
     private static void listTasks(TaskList taskList, Ui ui) {
         int displayIndex = 1;
         for (Todo task : taskList.getVisibleTasks()) {
@@ -51,6 +57,15 @@ public class Parser {
         }
     }
 
+    /**
+     * Toggles the status of the selected task and saves the updated task list.
+     *
+     * @param parts the command tokens containing the user-visible task number
+     * @param commandName the command indicating whether the task is marked or unmarked
+     * @param taskList the task list containing the selected task
+     * @param ui the user interface used to report the status change
+     * @param storage the storage used to persist the updated task list
+     */
     private static void updateTaskStatus(String[] parts, String commandName, TaskList taskList,
                                          Ui ui, Storage storage) {
         int taskNumber = parseTaskNumber(parts);
@@ -61,6 +76,14 @@ public class Parser {
         storage.saveTasks(taskList);
     }
 
+    /**
+     * Deletes the selected visible task and saves the updated task list.
+     *
+     * @param parts the command tokens containing the user-visible task number
+     * @param taskList the task list containing the selected task
+     * @param ui the user interface used to report the deletion
+     * @param storage the storage used to persist the updated task list
+     */
     private static void deleteTask(String[] parts, TaskList taskList, Ui ui, Storage storage) {
         int taskNumber = parseTaskNumber(parts);
         Todo removedTask = taskList.getVisibleTask(taskNumber - 1);
@@ -81,6 +104,17 @@ public class Parser {
         }
     }
 
+    /**
+     * Creates a task from the command and adds it to the task list.
+     *
+     * @param command the complete command entered by the user
+     * @param commandName the task type specified by the command
+     * @param parts the command tokens used to validate the command
+     * @param taskList the task list to which the new task is added
+     * @param ui the user interface used to report the newly added task
+     * @param storage the storage used to persist the updated task list
+     * @throws Computa.ComputaException if the command is invalid or lacks a description
+     */
     private static void createTask(String command, String commandName, String[] parts,
                                    TaskList taskList, Ui ui, Storage storage)
             throws Computa.ComputaException {
