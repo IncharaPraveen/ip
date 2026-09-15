@@ -9,6 +9,7 @@ public class Computa {
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
+    private boolean lastCommandHadError;
 
     public Computa(String filePath) {
         assert filePath != null && !filePath.isBlank() : "The task file path must be usable";
@@ -48,16 +49,25 @@ public class Computa {
      */
     public String processCommand(String command) {
         assert command != null : "A command must be provided for processing";
+        lastCommandHadError = false;
         try {
             Parser.parse(command, tasks, ui, storage);
         } catch (IndexOutOfBoundsException e) {
+            lastCommandHadError = true;
             ui.showError("that task number doesnt exist girl");
         } catch (ComputaException e) {
+            lastCommandHadError = true;
             ui.showError(e.getMessage());
         } catch (NumberFormatException e) {
+            lastCommandHadError = true;
             ui.showError("bruh put a real number");
         }
         return ui.collectOutput();
+    }
+
+    /** Returns whether the most recently processed GUI command failed. */
+    public boolean lastCommandHadError() {
+        return lastCommandHadError;
     }
     /**
      * The main method that serves as the entry point for the application.
