@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 
 /**
  * Handles the loading and saving of task data to a local file on the hard drive.
@@ -53,6 +55,18 @@ public class Storage {
                         case "E" -> {
                             assert taskData.length >= 5 : "An event must include start and end dates";
                             tasks.add(new Event(taskData[2], taskData[3], taskData[4], isDone));
+                        }
+                        case "R" -> {
+                            assert taskData.length >= 5 : "A recurring task needs a weekday";
+                            DayOfWeek day = DayOfWeek.valueOf(taskData[3].toUpperCase());
+                            if (taskData[4].startsWith("NONE:")) {
+                                String date = taskData[4].substring(5);
+                                tasks.add(new RecurringTask(taskData[2], day,
+                                        "NONE".equals(date) ? null : LocalDate.parse(date)));
+                            } else {
+                                tasks.add(new RecurringTask(taskData[2], day,
+                                        LocalDate.parse(taskData[4]), isDone));
+                            }
                         }
                         default -> { }
                     }

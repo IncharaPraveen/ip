@@ -52,6 +52,10 @@ public class Todo {
         return getTaskType() + getStatusIcon() + " " + description + "\n";
     }
 
+    public String getDescription() {
+        return description;
+    }
+
 
 
     /**

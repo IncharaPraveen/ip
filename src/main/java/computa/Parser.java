@@ -1,5 +1,6 @@
 package computa;
 
+import java.time.DayOfWeek;
 
 
 /**
@@ -28,8 +29,9 @@ public class Parser {
 
 
             if (trimmedCommand.equals(COMMAND_LIST)) {
-                for (int i = 0; i < taskList.getSize(); i++) {
-                    ui.showMessage((i + 1) + ". " + taskList.getTask(i).getTaskDescription());
+                int displayIndex = 1;
+                for (Todo task : taskList.getVisibleTasks()) {
+                    ui.showMessage(displayIndex++ + ". " + task.getTaskDescription());
                 }
                 return false;
             }
@@ -37,7 +39,7 @@ public class Parser {
             String commandName = commandParts[0];
             if (commandName.equals(COMMAND_MARK) || commandName.equals(COMMAND_UNMARK)) {
                 int taskNumber = Integer.parseInt(commandParts[1]);
-                Todo task = taskList.getTask(taskNumber - 1);
+                Todo task = taskList.getVisibleTask(taskNumber - 1);
                 task.changeStatusIcon();
                 String status = commandName.equals(COMMAND_MARK) ? "done" : "UNdone";
                 ui.showMessage("ok this task is " + status + " neow\n" + task.getTaskDescription());
@@ -46,7 +48,8 @@ public class Parser {
             }
             if (commandName.equals(COMMAND_DELETE)) {
                 int taskNumber = Integer.parseInt(commandParts[1]);
-                Todo removedTask = taskList.deleteTask(taskNumber - 1);
+                Todo removedTask = taskList.getVisibleTask(taskNumber - 1);
+                taskList.deleteTask(findTaskIndex(taskList, removedTask));
                 ui.showMessage("ok this task is removed neow\n" + removedTask.getTaskDescription());
                 storage.saveTasks(taskList);
                 return false;
@@ -56,12 +59,13 @@ public class Parser {
             if (commandName.equals(COMMAND_FIND)) {
                 ui.showMessage("yoo these r the matching tasks!");
                 String searchWord = getArgument(trimmedCommand);
-                for (int i = 0; i < taskList.getSize(); i++) {
-                    Todo task = taskList.getTask(i);
+                int displayIndex = 1;
+                for (Todo task : taskList.getVisibleTasks()) {
 
                     if (task.getTaskDescription().contains(searchWord)) {
-                        ui.showMessage((i + 1) + ". " + task.getTaskDescription());
+                        ui.showMessage(displayIndex + ". " + task.getTaskDescription());
                     }
+                    displayIndex++;
                 }
                 return false;
             }
@@ -92,6 +96,19 @@ public class Parser {
                     description = getArgument(eventParts[0]);
                     taskList.addTask(new Event(description, eventParts[1].trim(), eventParts[2].trim()));
                 }
+                case "recurring" -> {
+                    String[] recurringParts = command.split("/", 2);
+                    if (recurringParts.length < 2 || !recurringParts[0].contains(" ")) {
+                        throw new Computa.ComputaException("use: recurring <description> / <weekday>");
+                    }
+                    description = getArgument(recurringParts[0]);
+                    try {
+                        DayOfWeek day = DayOfWeek.valueOf(recurringParts[1].trim().toUpperCase());
+                        taskList.addTask(new RecurringTask(description, day));
+                    } catch (IllegalArgumentException e) {
+                        throw new Computa.ComputaException("weekday must be Monday to Sunday");
+                    }
+                }
                 default -> throw new Computa.ComputaException("bruh what is u talkin about");
             }
             assert taskList.getSize() > 0 : "Creating a task must leave at least one task";
@@ -102,6 +119,15 @@ public class Parser {
             ui.showMessage("Now u got " + taskList.getSize() + " numba of tasks in da list ");
             storage.saveTasks(taskList);
             return false;
+        }
+
+        private static int findTaskIndex(TaskList taskList, Todo target) {
+            for (int i = 0; i < taskList.getSize(); i++) {
+                if (taskList.getTask(i) == target) {
+                    return i;
+                }
+            }
+            throw new IndexOutOfBoundsException();
         }
 
         /** Returns the text following the command name. */
