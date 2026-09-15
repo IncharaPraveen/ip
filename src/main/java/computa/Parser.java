@@ -92,6 +92,13 @@ public class Parser {
         storage.saveTasks(taskList);
     }
 
+    /**
+     * Displays visible tasks whose descriptions contain the search text.
+     *
+     * @param command the command containing the search text
+     * @param taskList the task list to search
+     * @param ui the user interface used to display matching tasks
+     */
     private static void findTasks(String command, TaskList taskList, Ui ui) {
         String searchWord = getArgument(command);
         ui.showMessage("Matching tasks:");
@@ -217,6 +224,13 @@ public class Parser {
         }
     }
 
+    /**
+     * Extracts the user-visible task number from command parts.
+     *
+     * @param parts the command parts containing the task number
+     * @return the parsed task number
+     * @throws NumberFormatException if the task number is missing or not an integer
+     */
     private static int parseTaskNumber(String[] parts) {
         if (parts.length < 2) {
             throw new NumberFormatException("Missing task number");
@@ -224,6 +238,14 @@ public class Parser {
         return Integer.parseInt(parts[1]);
     }
 
+    /**
+     * Finds the zero-based position of a task in the complete task list.
+     *
+     * @param taskList the task list to search
+     * @param target the task whose position should be found
+     * @return the zero-based index of the target task
+     * @throws IndexOutOfBoundsException if the target task is not in the list
+     */
     private static int findTaskIndex(TaskList taskList, Todo target) {
         for (int i = 0; i < taskList.getSize(); i++) {
             if (taskList.getTask(i) == target) {
