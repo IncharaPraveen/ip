@@ -3,10 +3,7 @@ package computa;
 import java.time.DayOfWeek;
 import java.time.format.DateTimeParseException;
 
-
-/**
- * Processes and executes user commands for the Computa application.
- */
+/** Processes and executes user commands for the Computa application. */
 public class Parser {
     private static final String COMMAND_EXIT = "bye";
     private static final String COMMAND_LIST = "list";
@@ -15,138 +12,164 @@ public class Parser {
     private static final String COMMAND_UNMARK = "unmark";
     private static final String COMMAND_DELETE = "delete";
 
+    /** Processes one command and returns whether the application should exit. */
     public static boolean parse(String command, TaskList taskList, Ui ui, Storage storage)
             throws Computa.ComputaException {
-        assert command != null : "The parser must receive a command";
-        assert taskList != null : "The parser must receive a task list";
-        assert ui != null : "The parser must receive a UI";
-        assert storage != null : "The parser must receive storage";
+        if (command == null || taskList == null || ui == null || storage == null) {
+            throw new IllegalArgumentException("Command, task list, UI, and storage are required");
+        }
         String trimmedCommand = command.trim();
         if (trimmedCommand.equals(COMMAND_EXIT)) {
             return true;
         }
-
-
-
-
-            if (trimmedCommand.equals(COMMAND_LIST)) {
-                int displayIndex = 1;
-                for (Todo task : taskList.getVisibleTasks()) {
-                    ui.showMessage(displayIndex++ + ". " + task.getTaskDescription());
-                }
-                return false;
-            }
-            String[] commandParts = trimmedCommand.split("\\s+");
-            String commandName = commandParts[0];
-            if (commandName.equals(COMMAND_MARK) || commandName.equals(COMMAND_UNMARK)) {
-                int taskNumber = Integer.parseInt(commandParts[1]);
-                Todo task = taskList.getVisibleTask(taskNumber - 1);
-                task.changeStatusIcon();
-                String status = commandName.equals(COMMAND_MARK) ? "done" : "UNdone";
-                ui.showMessage("ok this task is " + status + " neow\n" + task.getTaskDescription());
-                storage.saveTasks(taskList);
-                return false;
-            }
-            if (commandName.equals(COMMAND_DELETE)) {
-                int taskNumber = Integer.parseInt(commandParts[1]);
-                Todo removedTask = taskList.getVisibleTask(taskNumber - 1);
-                taskList.deleteTask(findTaskIndex(taskList, removedTask));
-                ui.showMessage("ok this task is removed neow\n" + removedTask.getTaskDescription());
-                storage.saveTasks(taskList);
-                return false;
-            }
-            //if the command contains "find", parse the searchword,
-            // search each task in the tasklist's description for the word, if it contains, then add this task to a new list -> display this new list
-            if (commandName.equals(COMMAND_FIND)) {
-                ui.showMessage("yoo these r the matching tasks!");
-                String searchWord = getArgument(trimmedCommand);
-                int displayIndex = 1;
-                for (Todo task : taskList.getVisibleTasks()) {
-
-                    if (task.getTaskDescription().contains(searchWord)) {
-                        ui.showMessage(displayIndex + ". " + task.getTaskDescription());
-                    }
-                    displayIndex++;
-                }
-                return false;
-            }
-
-
-            String description;
-            switch (commandName) {
-                case "todo" -> {
-                    if (commandParts.length == 1) {
-                        throw new Computa.ComputaException("no desc?");
-                    }
-                    description = getArgument(trimmedCommand);
-                    taskList.addTask(new Todo(description));
-                }
-                case "deadline" -> {
-                    String[] deadlineParts = command.split("/");
-                    if (deadlineParts.length < 2 || !deadlineParts[0].contains(" ")) {
-                        throw new Computa.ComputaException("no deadline?");
-                    }
-                    description = getArgument(deadlineParts[0]);
-                    try {
-                        taskList.addTask(new Deadline(description, deadlineParts[1].trim()));
-                    } catch (DateTimeParseException e) {
-                        throw new Computa.ComputaException(
-                                "invalid deadline format; use yyyy-MM-dd HHmm, e.g. 2026-09-20 1830");
-                    }
-                }
-                case "event" -> {
-                    String[] eventParts = command.split("/");
-                    if (eventParts.length < 3 || !eventParts[0].contains(" ")) {
-                        throw new Computa.ComputaException("no dates set?");
-                    }
-                    description = getArgument(eventParts[0]);
-                    try {
-                        taskList.addTask(new Event(description, eventParts[1].trim(), eventParts[2].trim()));
-                    } catch (DateTimeParseException e) {
-                        throw new Computa.ComputaException(
-                                "invalid event date/time; use yyyy-MM-dd HHmm for both dates, "
-                                        + "e.g. event meeting / 2026-09-20 1400 / 2026-09-20 1500");
-                    }
-                }
-                case "recurring" -> {
-                    String[] recurringParts = command.split("/", 2);
-                    if (recurringParts.length < 2 || !recurringParts[0].contains(" ")) {
-                        throw new Computa.ComputaException("use: recurring <description> / <weekday>");
-                    }
-                    description = getArgument(recurringParts[0]);
-                    try {
-                        DayOfWeek day = DayOfWeek.valueOf(recurringParts[1].trim().toUpperCase());
-                        taskList.addTask(new RecurringTask(description, day));
-                    } catch (IllegalArgumentException e) {
-                        throw new Computa.ComputaException("weekday must be Monday to Sunday");
-                    }
-                }
-                default -> throw new Computa.ComputaException("bruh what is u talkin about");
-            }
-            assert taskList.getSize() > 0 : "Creating a task must leave at least one task";
-            if (description.isEmpty()) {
-                throw new Computa.ComputaException("you forgot to desc ur task. lock in bruh");
-            }
-            ui.showMessage("added: " + taskList.getTask(taskList.getSize() - 1).getTaskDescription());
-            ui.showMessage("Now u got " + taskList.getSize() + " numba of tasks in da list ");
-            storage.saveTasks(taskList);
+        if (trimmedCommand.equals(COMMAND_LIST)) {
+            listTasks(taskList, ui);
             return false;
         }
-
-        private static int findTaskIndex(TaskList taskList, Todo target) {
-            for (int i = 0; i < taskList.getSize(); i++) {
-                if (taskList.getTask(i) == target) {
-                    return i;
-                }
-            }
-            throw new IndexOutOfBoundsException();
+        String[] commandParts = trimmedCommand.split("\\s+");
+        String commandName = commandParts[0];
+        if (commandName.equals(COMMAND_MARK) || commandName.equals(COMMAND_UNMARK)) {
+            updateTaskStatus(commandParts, commandName, taskList, ui, storage);
+            return false;
         }
+        if (commandName.equals(COMMAND_DELETE)) {
+            deleteTask(commandParts, taskList, ui, storage);
+            return false;
+        }
+        if (commandName.equals(COMMAND_FIND)) {
+            findTasks(trimmedCommand, taskList, ui);
+            return false;
+        }
+        createTask(trimmedCommand, commandName, commandParts, taskList, ui, storage);
+        return false;
+    }
 
-        /** Returns the text following the command name. */
-        private static String getArgument (String command){
-            int separator = command.indexOf(' ');
-            return separator < 0 ? "" : command.substring(separator + 1).trim();
+    private static void listTasks(TaskList taskList, Ui ui) {
+        int displayIndex = 1;
+        for (Todo task : taskList.getVisibleTasks()) {
+            ui.showMessage(displayIndex++ + ". " + task.getTaskDescription());
         }
     }
 
+    private static void updateTaskStatus(String[] parts, String commandName, TaskList taskList,
+                                         Ui ui, Storage storage) {
+        int taskNumber = parseTaskNumber(parts);
+        Todo task = taskList.getVisibleTask(taskNumber - 1);
+        task.changeStatusIcon();
+        String status = commandName.equals(COMMAND_MARK) ? "done" : "undone";
+        ui.showMessage("Task marked " + status + "\n" + task.getTaskDescription());
+        storage.saveTasks(taskList);
+    }
 
+    private static void deleteTask(String[] parts, TaskList taskList, Ui ui, Storage storage) {
+        int taskNumber = parseTaskNumber(parts);
+        Todo removedTask = taskList.getVisibleTask(taskNumber - 1);
+        taskList.deleteTask(findTaskIndex(taskList, removedTask));
+        ui.showMessage("Task removed\n" + removedTask.getTaskDescription());
+        storage.saveTasks(taskList);
+    }
+
+    private static void findTasks(String command, TaskList taskList, Ui ui) {
+        String searchWord = getArgument(command);
+        ui.showMessage("Matching tasks:");
+        int displayIndex = 1;
+        for (Todo task : taskList.getVisibleTasks()) {
+            if (task.getTaskDescription().contains(searchWord)) {
+                ui.showMessage(displayIndex + ". " + task.getTaskDescription());
+            }
+            displayIndex++;
+        }
+    }
+
+    private static void createTask(String command, String commandName, String[] parts,
+                                   TaskList taskList, Ui ui, Storage storage)
+            throws Computa.ComputaException {
+        String description;
+        switch (commandName) {
+        case "todo" -> {
+            requireParts(parts, 2, "A todo needs a description");
+            description = getArgument(command);
+            taskList.addTask(new Todo(description));
+        }
+        case "deadline" -> description = addDeadline(command, taskList);
+        case "event" -> description = addEvent(command, taskList);
+        case "recurring" -> description = addRecurring(command, taskList);
+        default -> throw new Computa.ComputaException("Unknown command");
+        }
+        if (description.isEmpty()) {
+            throw new Computa.ComputaException("A task description is required");
+        }
+        ui.showMessage("Added: " + taskList.getTask(taskList.getSize() - 1).getTaskDescription());
+        ui.showMessage("Task count: " + taskList.getSize());
+        storage.saveTasks(taskList);
+    }
+
+    private static String addDeadline(String command, TaskList taskList)
+            throws Computa.ComputaException {
+        String[] parts = command.split("/", 2);
+        requireParts(parts, 2, "Use: deadline <description> / yyyy-MM-dd HHmm");
+        String description = getArgument(parts[0]);
+        try {
+            taskList.addTask(new Deadline(description, parts[1].trim()));
+        } catch (DateTimeParseException exception) {
+            throw new Computa.ComputaException("Invalid deadline format; use yyyy-MM-dd HHmm");
+        }
+        return description;
+    }
+
+    private static String addEvent(String command, TaskList taskList)
+            throws Computa.ComputaException {
+        String[] parts = command.split("/");
+        requireParts(parts, 3, "Use: event <description> / start / end");
+        String description = getArgument(parts[0]);
+        try {
+            taskList.addTask(new Event(description, parts[1].trim(), parts[2].trim()));
+        } catch (DateTimeParseException exception) {
+            throw new Computa.ComputaException("Invalid event date/time; use yyyy-MM-dd HHmm");
+        }
+        return description;
+    }
+
+    private static String addRecurring(String command, TaskList taskList)
+            throws Computa.ComputaException {
+        String[] parts = command.split("/", 2);
+        requireParts(parts, 2, "Use: recurring <description> / <weekday>");
+        String description = getArgument(parts[0]);
+        try {
+            DayOfWeek day = DayOfWeek.valueOf(parts[1].trim().toUpperCase());
+            taskList.addTask(new RecurringTask(description, day));
+        } catch (IllegalArgumentException exception) {
+            throw new Computa.ComputaException("Weekday must be Monday to Sunday");
+        }
+        return description;
+    }
+
+    private static void requireParts(String[] parts, int minimum, String message)
+            throws Computa.ComputaException {
+        if (parts.length < minimum) {
+            throw new Computa.ComputaException(message);
+        }
+    }
+
+    private static int parseTaskNumber(String[] parts) {
+        if (parts.length < 2) {
+            throw new NumberFormatException("Missing task number");
+        }
+        return Integer.parseInt(parts[1]);
+    }
+
+    private static int findTaskIndex(TaskList taskList, Todo target) {
+        for (int i = 0; i < taskList.getSize(); i++) {
+            if (taskList.getTask(i) == target) {
+                return i;
+            }
+        }
+        throw new IndexOutOfBoundsException();
+    }
+
+    /** Returns the text following the command name. */
+    private static String getArgument(String command) {
+        int separator = command.indexOf(' ');
+        return separator < 0 ? "" : command.substring(separator + 1).trim();
+    }
+}

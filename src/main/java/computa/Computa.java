@@ -1,8 +1,4 @@
 package computa;
-import computa.Parser;
-import computa.Storage;
-import computa.TaskList;
-import computa.Ui;
 import java.time.LocalDate;
 
 public class Computa {
@@ -13,7 +9,9 @@ public class Computa {
     private boolean lastCommandHadError;
 
     public Computa(String filePath) {
-        assert filePath != null && !filePath.isBlank() : "The task file path must be usable";
+        if (filePath == null || filePath.isBlank()) {
+            throw new IllegalArgumentException("The task file path must be usable");
+        }
         ui = new Ui();
         storage = new Storage(filePath);
         try {
@@ -22,7 +20,6 @@ public class Computa {
             ui.showError(e.getMessage());
             tasks = new TaskList();
         }
-        assert tasks != null : "Computa must always have a task list";
         if (tasks.generateRecurringTasks(LocalDate.now())) {
             storage.saveTasks(tasks);
         }

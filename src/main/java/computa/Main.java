@@ -35,12 +35,9 @@ public class Main extends Application {
         chat.setFitToWidth(true);
         addMessage(messages, "haiii i am computa! lmk what u need ehaha", false);
 
-        // Input is the user's command.
         TextField input = new TextField();
         input.setPromptText("Enter a command, e.g. list or todo study");
         Button send = new Button("Send");
-//create a send button, setOnAction , call eventHandler submit -> we will send the input to Parser.java
-        //
         Runnable submit = () -> {
             String command = input.getText().trim();
             if (command.isEmpty()) {
@@ -67,8 +64,6 @@ public class Main extends Application {
         input.setOnAction(event -> submit.run());
 
         HBox commandBar = new HBox(8, input, send);
-        //create horizontally layed out input & sender
-
         HBox.setHgrow(input, Priority.ALWAYS);
         commandBar.setPadding(new Insets(10, 12, 12, 12));
         commandBar.setStyle("-fx-background-color: #ffdce9;");
@@ -83,8 +78,6 @@ public class Main extends Application {
         stage.setTitle("Computa");
         stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
         stage.show();
-        //stage is whatever is on comp screen, attatch a scene to a stage ( scene contains all layout + ui elems)
-        //scene starts w root elem -> this is BoderPane, containing the chat
     }
 
     /** Adds one message row containing the sender's avatar, name, and text. */

@@ -10,13 +10,13 @@ class ComputaTest {
 
     @Test void validCommandProducesResponse() {
         Computa computa = new Computa(directory.resolve("tasks.txt").toString());
-        assertTrue(computa.processCommand("todo study").contains("added"));
+        assertTrue(computa.processCommand("todo study").contains("Added"));
         assertFalse(computa.lastCommandHadError());
     }
 
     @Test void invalidCommandIsReportedAsError() {
         Computa computa = new Computa(directory.resolve("tasks.txt").toString());
-        assertTrue(computa.processCommand("not a command").contains("bruh"));
+        assertTrue(computa.processCommand("not a command").contains("Unknown command"));
         assertTrue(computa.lastCommandHadError());
     }
 

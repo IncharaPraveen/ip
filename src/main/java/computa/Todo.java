@@ -22,7 +22,9 @@ public class Todo {
      * @param isDone      The completion status of the task (true if done, false if undone).
      */
     public Todo(String description, boolean isDone) {
-        assert description != null : "A task description must not be null";
+        if (description == null) {
+            throw new IllegalArgumentException("A task description must not be null");
+        }
         this.description = description;
         this.isDone = isDone;
     }
