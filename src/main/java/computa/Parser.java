@@ -1,6 +1,7 @@
 package computa;
 
 import java.time.DayOfWeek;
+import java.time.format.DateTimeParseException;
 
 
 /**
@@ -86,7 +87,12 @@ public class Parser {
                         throw new Computa.ComputaException("no deadline?");
                     }
                     description = getArgument(deadlineParts[0]);
-                    taskList.addTask(new Deadline(description, deadlineParts[1].trim()));
+                    try {
+                        taskList.addTask(new Deadline(description, deadlineParts[1].trim()));
+                    } catch (DateTimeParseException e) {
+                        throw new Computa.ComputaException(
+                                "invalid deadline format; use yyyy-MM-dd HHmm, e.g. 2026-09-20 1830");
+                    }
                 }
                 case "event" -> {
                     String[] eventParts = command.split("/");
@@ -94,7 +100,13 @@ public class Parser {
                         throw new Computa.ComputaException("no dates set?");
                     }
                     description = getArgument(eventParts[0]);
-                    taskList.addTask(new Event(description, eventParts[1].trim(), eventParts[2].trim()));
+                    try {
+                        taskList.addTask(new Event(description, eventParts[1].trim(), eventParts[2].trim()));
+                    } catch (DateTimeParseException e) {
+                        throw new Computa.ComputaException(
+                                "invalid event date/time; use yyyy-MM-dd HHmm for both dates, "
+                                        + "e.g. event meeting / 2026-09-20 1400 / 2026-09-20 1500");
+                    }
                 }
                 case "recurring" -> {
                     String[] recurringParts = command.split("/", 2);
