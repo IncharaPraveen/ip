@@ -82,7 +82,7 @@ public class Main extends Application {
             imageView.setPreserveRatio(true);
             avatar = imageView;
         } else {
-            avatar = new Label(fromUser ? "🙂" : "🤖");
+            avatar = new Label(fromUser ? "UserImage" : "ComputaImage");
         }
 
         Label sender = new Label(fromUser ? "User" : "Computa");

@@ -3,6 +3,7 @@ import computa.Parser;
 import computa.Storage;
 import computa.TaskList;
 import computa.Ui;
+import java.time.LocalDate;
 
 public class Computa {
     private static final String TASK_FILE_PATH = "./tasks.txt";
@@ -21,6 +22,9 @@ public class Computa {
             tasks = new TaskList();
         }
         assert tasks != null : "Computa must always have a task list";
+        if (tasks.generateRecurringTasks(LocalDate.now())) {
+            storage.saveTasks(tasks);
+        }
     }
 
     public void run() {
