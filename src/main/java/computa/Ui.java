@@ -52,6 +52,7 @@ public class Ui {
         String messages = output.toString();
         output.setLength(0);
         return messages;
+
     }
     /**
      * Displays the parting farewell message and safely closes the system input scanner.
