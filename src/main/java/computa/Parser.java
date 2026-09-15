@@ -138,6 +138,14 @@ public class Parser {
         storage.saveTasks(taskList);
     }
 
+    /**
+     * Creates and adds a deadline task from the supplied command.
+     *
+     * @param command the command containing the description and deadline
+     * @param taskList the task list to which the deadline is added
+     * @return the description of the created deadline task
+     * @throws Computa.ComputaException if the command format or deadline is invalid
+     */
     private static String addDeadline(String command, TaskList taskList)
             throws Computa.ComputaException {
         String[] parts = command.split("/", 2);
@@ -151,6 +159,14 @@ public class Parser {
         return description;
     }
 
+    /**
+     * Creates and adds an event task from the supplied command.
+     *
+     * @param command the command containing the description, start, and end times
+     * @param taskList the task list to which the event is added
+     * @return the description of the created event task
+     * @throws Computa.ComputaException if the command format or event times are invalid
+     */
     private static String addEvent(String command, TaskList taskList)
             throws Computa.ComputaException {
         String[] parts = command.split("/");
@@ -164,6 +180,14 @@ public class Parser {
         return description;
     }
 
+    /**
+     * Creates and adds a recurring task from the supplied command.
+     *
+     * @param command the command containing the description and weekday
+     * @param taskList the task list to which the recurring task is added
+     * @return the description of the created recurring task
+     * @throws Computa.ComputaException if the command format or weekday is invalid
+     */
     private static String addRecurring(String command, TaskList taskList)
             throws Computa.ComputaException {
         String[] parts = command.split("/", 2);
@@ -178,6 +202,14 @@ public class Parser {
         return description;
     }
 
+    /**
+     * Verifies that a command contains at least the required number of parts.
+     *
+     * @param parts the command parts to validate
+     * @param minimum the minimum number of required parts
+     * @param message the error message to use when validation fails
+     * @throws Computa.ComputaException if fewer than the required parts are present
+     */
     private static void requireParts(String[] parts, int minimum, String message)
             throws Computa.ComputaException {
         if (parts.length < minimum) {
