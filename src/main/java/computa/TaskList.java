@@ -30,7 +30,7 @@ public class TaskList {
      *
      * @param index The 0-based index of the task to be removed.
      * @return The Task object that was successfully removed.
-     * @throws ComputaException If the provided index is out of bounds.
+     * @throws Computa.ComputaException If the provided index is out of bounds.
      */
     public Todo deleteTask (int index) {
         Todo removedTask = tasks.remove(index);

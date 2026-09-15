@@ -1,4 +1,7 @@
 package computa;
+
+
+
 /**
  * Processes and executes user commands for the Computa application.
  */
@@ -18,92 +21,94 @@ public class Parser {
         assert storage != null : "The parser must receive storage";
         String trimmedCommand = command.trim();
         if (trimmedCommand.equals(COMMAND_EXIT)) {
-           return true; 
+            return true;
         }
-     
-        if (command.equals("bye")) {
-           
-        
-        if (trimmedCommand.equals(COMMAND_LIST)) {
-            for (int i = 0; i < taskList.getSize(); i++) {
-                ui.showMessage((i + 1) + ". " + taskList.getTask(i).getTaskDescription());
+
+
+
+
+            if (trimmedCommand.equals(COMMAND_LIST)) {
+                for (int i = 0; i < taskList.getSize(); i++) {
+                    ui.showMessage((i + 1) + ". " + taskList.getTask(i).getTaskDescription());
+                }
+                return false;
             }
-            return false;
-        }
-        String[] commandParts = trimmedCommand.split("\\s+");
-        String commandName = commandParts[0];
-        if (commandName.equals(COMMAND_MARK) || commandName.equals(COMMAND_UNMARK)) {
-            int taskNumber = Integer.parseInt(commandParts[1]);
-            Todo task = taskList.getTask(taskNumber - 1);
-            task.changeStatusIcon();
-            String status = commandName.equals(COMMAND_MARK) ? "done" : "UNdone";
-            ui.showMessage("ok this task is " + status + " neow\n" + task.getTaskDescription());
+            String[] commandParts = trimmedCommand.split("\\s+");
+            String commandName = commandParts[0];
+            if (commandName.equals(COMMAND_MARK) || commandName.equals(COMMAND_UNMARK)) {
+                int taskNumber = Integer.parseInt(commandParts[1]);
+                Todo task = taskList.getTask(taskNumber - 1);
+                task.changeStatusIcon();
+                String status = commandName.equals(COMMAND_MARK) ? "done" : "UNdone";
+                ui.showMessage("ok this task is " + status + " neow\n" + task.getTaskDescription());
+                storage.saveTasks(taskList);
+                return false;
+            }
+            if (commandName.equals(COMMAND_DELETE)) {
+                int taskNumber = Integer.parseInt(commandParts[1]);
+                Todo removedTask = taskList.deleteTask(taskNumber - 1);
+                ui.showMessage("ok this task is removed neow\n" + removedTask.getTaskDescription());
+                storage.saveTasks(taskList);
+                return false;
+            }
+            //if the command contains "find", parse the searchword,
+            // search each task in the tasklist's description for the word, if it contains, then add this task to a new list -> display this new list
+            if (commandName.equals(COMMAND_FIND)) {
+                ui.showMessage("yoo these r the matching tasks!");
+                String searchWord = getArgument(trimmedCommand);
+                for (int i = 0; i < taskList.getSize(); i++) {
+                    Todo task = taskList.getTask(i);
+
+                    if (task.getTaskDescription().contains(searchWord)) {
+                        ui.showMessage((i + 1) + ". " + task.getTaskDescription());
+                    }
+                }
+                return false;
+            }
+
+
+            String description;
+            switch (commandName) {
+                case "todo" -> {
+                    if (commandParts.length == 1) {
+                        throw new Computa.ComputaException("no desc?");
+                    }
+                    description = getArgument(trimmedCommand);
+                    taskList.addTask(new Todo(description));
+                }
+                case "deadline" -> {
+                    String[] deadlineParts = command.split("/");
+                    if (deadlineParts.length < 2 || !deadlineParts[0].contains(" ")) {
+                        throw new Computa.ComputaException("no deadline?");
+                    }
+                    description = getArgument(deadlineParts[0]);
+                    taskList.addTask(new Deadline(description, deadlineParts[1].trim()));
+                }
+                case "event" -> {
+                    String[] eventParts = command.split("/");
+                    if (eventParts.length < 3 || !eventParts[0].contains(" ")) {
+                        throw new Computa.ComputaException("no dates set?");
+                    }
+                    description = getArgument(eventParts[0]);
+                    taskList.addTask(new Event(description, eventParts[1].trim(), eventParts[2].trim()));
+                }
+                default -> throw new Computa.ComputaException("bruh what is u talkin about");
+            }
+            assert taskList.getSize() > 0 : "Creating a task must leave at least one task";
+            if (description.isEmpty()) {
+                throw new Computa.ComputaException("you forgot to desc ur task. lock in bruh");
+            }
+            ui.showMessage("added: " + taskList.getTask(taskList.getSize() - 1).getTaskDescription());
+            ui.showMessage("Now u got " + taskList.getSize() + " numba of tasks in da list ");
             storage.saveTasks(taskList);
             return false;
         }
-        if (commandName.equals(COMMAND_DELETE)) {
-            int taskNumber = Integer.parseInt(commandParts[1]);
-            Todo removedTask = taskList.deleteTask(taskNumber - 1);
-            ui.showMessage("ok this task is removed neow\n" + removedTask.getTaskDescription());
-            storage.saveTasks(taskList);
-            return false;
-        }
-        //if the command contains "find", parse the searchword,
-        // search each task in the tasklist's description for the word, if it contains, then add this task to a new list -> display this new list
-        if (commandName.equals(COMMAND_FIND)) {
-            ui.showMessage("yoo these r the matching tasks!");
-            String searchWord = getArgument(trimmedCommand);
-            for (int i = 0; i < taskList.getSize(); i++) {
-                Todo task = taskList.getTask(i);
 
-                if (task.getTaskDescription().contains(searchWord)) {
-                    ui.showMessage((i + 1) + ". " + task.getTaskDescription());
-                }
-            }
-            return false;
+        /** Returns the text following the command name. */
+        private static String getArgument (String command){
+            int separator = command.indexOf(' ');
+            return separator < 0 ? "" : command.substring(separator + 1).trim();
         }
-
-
-        String description;
-        switch (commandName) {
-            case "todo" -> {
-                if (commandParts.length == 1) {
-                    throw new Computa.ComputaException("no desc?");
-                }
-                description = getArgument(trimmedCommand);
-                taskList.addTask(new Todo(description));
-            }
-            case "deadline" -> {
-                String[] deadlineParts = command.split("/");
-                if (deadlineParts.length < 2 || !deadlineParts[0].contains(" ")) {
-                    throw new Computa.ComputaException("no deadline?");
-                }
-                description = getArgument(deadlineParts[0]);
-                taskList.addTask(new Deadline(description, deadlineParts[1].trim()));
-            }
-            case "event" -> {
-                String[] eventParts = command.split("/");
-                if (eventParts.length < 3 || !eventParts[0].contains(" ")) {
-                    throw new Computa.ComputaException("no dates set?");
-                }
-                description = getArgument(eventParts[0]);
-                taskList.addTask(new Event(description, eventParts[1].trim(), eventParts[2].trim()));
-            }
-            default -> throw new Computa.ComputaException("bruh what is u talkin about");
-        }
-        assert taskList.getSize() > 0 : "Creating a task must leave at least one task";
-        if (description.isEmpty()) {
-            throw new Computa.ComputaException("you forgot to desc ur task. lock in bruh");
-        }
-        ui.showMessage("added: " + taskList.getTask(taskList.getSize() - 1).getTaskDescription());
-        ui.showMessage("Now u got " + taskList.getSize() + " numba of tasks in da list ");
-        storage.saveTasks(taskList);
-        return false;
     }
 
-    /** Returns the text following the command name. */
-    private static String getArgument(String command) {
-        int separator = command.indexOf(' ');
-        return separator < 0 ? "" : command.substring(separator + 1).trim();
-    }
-}
+

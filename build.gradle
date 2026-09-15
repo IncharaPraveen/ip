@@ -9,6 +9,14 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDir 'src/main/images'
+        }
+    }
+}
+
 repositories {
     mavenCentral()
 }
